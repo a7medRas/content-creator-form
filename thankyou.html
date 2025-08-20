@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تم استلام طلبك</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f8fc; --card:#ffffff; --text:#1b2333; --muted:#5b6477; --ring:#d7dced; --accent:#C99A00;
+    --ok:#0b704a; --err:#7a1d1d; --okbg:#e9f8f1; --errbg:#fdecec;
+  }
+  html[data-theme="dark"]{
+    --bg:#0f1220; --card:#14182a; --text:#eef1ff; --muted:#aeb6cf; --ring:#2a3350;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); font-family:'Cairo',system-ui;
+    color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+    transition: background .2s ease, color .2s ease;
+  }
+  .wrap{width:100%; max-width:720px}
+  .topbar{display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px}
+  .tbtn{background:var(--card); color:var(--text); border:1px solid var(--ring); border-radius:10px; padding:8px 12px; cursor:pointer; font-weight:700}
+  .card{
+    background:var(--card); border:1px solid var(--ring); border-radius:16px; padding:26px;
+    text-align:center; box-shadow:0 8px 28px rgba(16,24,40,.06)
+  }
+  h1{margin:0 0 10px; font-size:28px; background:linear-gradient(90deg,var(--accent), #FFD54A 35%, #B8860B); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  p{margin:8px 0; color:var(--muted)}
+  .ticket{display:inline-flex; align-items:center; gap:10px; border:1px dashed var(--ring); padding:10px 14px; border-radius:12px; font-weight:800; font-size:18px; margin:10px 0}
+  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px}
+  .btn{border:none; cursor:pointer; border-radius:12px; padding:10px 16px; font-weight:700; background:#eef1ff; border:1px solid var(--ring)}
+  .link{display:inline-block; text-decoration:none; padding:10px 16px; border-radius:12px; border:1px solid var(--ring); background:#eef1ff; color:inherit}
+  .msg{margin-top:10px; display:none; padding:10px 12px; border-radius:10px; font-weight:700}
+  .ok{color:var(--ok); background:var(--okbg)}
+  .err{color:var(--err); background:var(--errbg)}
+  .status{font-weight:800}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <button id="langBtn" class="tbtn">English</button>
+      <button id="themeBtn" class="tbtn">🌙</button>
+    </div>
+
+    <div class="card">
+      <h1 id="hTitle">شكرًا! ✅</h1>
+      <p id="pIntro">تم استلام طلبك بنجاح. احتفظ بهذا الكود لتتبُّع حالتك:</p>
+
+      <div class="ticket"><span id="lblTicket">Ticket ID:</span> <code id="tid">—</code></div>
+
+      <div class="row">
+        <button class="btn" id="copyBtn">نسخ الكود</button>
+        <button class="btn" id="trackBtn">تتبّع الحالة الآن</button>
+        <a class="link" href="./" id="backHome">رجوع للصفحة الرئيسية</a>
+      </div>
+
+      <p class="msg ok" id="msgOk">تم النسخ ✅</p>
+      <p class="msg err" id="msgErr">تعذر الاتصال بالخادم.</p>
+      <p class="msg err" id="msgNoTicket">لا يوجد كود في الرابط. الرجاء الرجوع للصفحة الرئيسية وإعادة الإرسال.</p>
+
+      <div id="trackResult" style="display:none; margin-top:14px">
+        <p><span id="lblCurrent">الحالة الحالية:</span> <span class="status" id="currStatus">—</span></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== Config =====
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb6QmbgguRd5ZEfGmAHkNwEzbXs4TdVW1m-8TLAX4wk19qx4lY7b4BYyI4g2kq4T0yIA/exec";
+
+  // ===== i18n =====
+  const i18n = {
+    ar: {
+      title:"شكرًا! ✅",
+      intro:"تم استلام طلبك بنجاح. احتفظ بهذا الكود لتتبُّع حالتك:",
+      ticket:"Ticket ID:",
+      copy:"نسخ الكود",
+      track:"تتبّع الحالة الآن",
+      back:"رجوع للصفحة الرئيسية",
+      copied:"تم النسخ ✅",
+      err:"تعذر الاتصال بالخادم.",
+      noticket:"لا يوجد كود في الرابط. الرجاء الرجوع للصفحة الرئيسية وإعادة الإرسال.",
+      current:"الحالة الحالية:"
+    },
+    en: {
+      title:"Thanks! ✅",
+      intro:"We received your submission. Keep this code to track your status:",
+      ticket:"Ticket ID:",
+      copy:"Copy Code",
+      track:"Track Status",
+      back:"Back to Home",
+      copied:"Copied ✅",
+      err:"Couldn’t reach the server.",
+      noticket:"No ticket found in the link. Please go back and resubmit.",
+      current:"Current status:"
+    }
+  };
+  let lang = localStorage.getItem("lang") || "ar";
+
+  function applyLang(){
+    const t = i18n[lang];
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang==="ar" ? "rtl" : "ltr");
+    document.getElementById("langBtn").textContent = (lang==="ar") ? "English" : "العربية";
+
+    hTitle.textContent = t.title;
+    pIntro.textContent = t.intro;
+    lblTicket.textContent = t.ticket;
+    copyBtn.textContent = t.copy;
+    trackBtn.textContent = t.track;
+    backHome.textContent = t.back;
+    msgOk.textContent = t.copied;
+    msgErr.textContent = t.err;
+    msgNoTicket.textContent = t.noticket;
+    lblCurrent.textContent = t.current;
+  }
+
+  function applyTheme(){
+    const saved = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", saved);
+    document.getElementById("themeBtn").textContent = (saved==="dark") ? "☀️" : "🌙";
+  }
+
+  // ===== Helpers =====
+  function getParam(name){ return new URLSearchParams(window.location.search).get(name) || ""; }
+  function show(el, on=true){ el.style.display = on ? "block" : "none"; }
+
+  // ===== Init ticket
+  const tid = getParam("ticket");
+  const tidEl = document.getElementById("tid");
+  const trackBtn = document.getElementById("trackBtn");
+  const msgNoTicket = document.getElementById("msgNoTicket");
+  tidEl.textContent = tid || "—";
+  if (!tid){
+    show(trackBtn, false);
+    show(msgNoTicket, true);
+  }
+
+  // ===== Copy
+  const msgOk = document.getElementById("msgOk");
+  document.getElementById("copyBtn").addEventListener("click", async ()=>{
+    if (!tid) return;
+    try{
+      await navigator.clipboard.writeText(tid);
+      show(msgOk, true); setTimeout(()=>show(msgOk,false), 2000);
+    }catch{}
+  });
+
+  // ===== Track
+  const msgErr = document.getElementById("msgErr");
+  const trackResult = document.getElementById("trackResult");
+  const currStatus = document.getElementById("currStatus");
+
+  trackBtn.addEventListener("click", async ()=>{
+    if (!tid) return;
+    show(msgErr, false);
+    try{
+      const res = await fetch(`${SCRIPT_URL}?id=${encodeURIComponent(tid)}`);
+      const json = await res.json().catch(()=> ({}));
+
+      // متوقع ترجع { status: "success"|"not_found"|"error", applicationStatus: "قيد المراجعة"|"مقبول"|... }
+      if (json.status === "success"){
+        currStatus.textContent = json.applicationStatus || "—";
+        show(trackResult, true);
+      } else if (json.status === "not_found"){
+        currStatus.textContent = (lang==="ar" ? "الكود غير موجود" : "Ticket not found");
+        show(trackResult, true);
+      } else {
+        show(msgErr, true);
+      }
+    }catch(e){
+      show(msgErr, true);
+    }
+  });
+
+  // ===== Lang & Theme toggles
+  document.getElementById("langBtn").addEventListener("click", ()=>{
+    lang = (lang==="ar") ? "en" : "ar";
+    localStorage.setItem("lang", lang);
+    applyLang();
+  });
+  document.getElementById("themeBtn").addEventListener("click", ()=>{
+    const curr = document.documentElement.getAttribute("data-theme") || "light";
+    const next = (curr==="light") ? "dark" : "light";
+    localStorage.setItem("theme", next);
+    applyTheme();
+  });
+
+  // ===== Apply
+  applyTheme();
+  applyLang();
+</script>
+</body>
+</html>
