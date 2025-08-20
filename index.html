@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>تقديم صانع محتوى</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ========== ألوان عامة (ثيم فاتح) ========== */
   :root{
     --bg:#f7f8fc; --card:#ffffff; --muted:#5b6477; --text:#1b2333;
     --accent:#C99A00; --ok:#178f5a; --danger:#c73737;
     --input:#f2f4fb; --ring:#d7dced;
+    --navy:#0a0f2b; --violet:#6123d6; --pink:#ff4fa1; --cyan:#32e1ff; --teal:#12c2e9; --silver:#dbe3ff;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -20,16 +22,132 @@
     display:flex; justify-content:center; padding:20px;
   }
   .wrap{width:100%; max-width:980px}
+
+  /* ========== إطار البنر ========== */
   .banner-frame{
     width:100%; background:#fff; border:2px solid var(--ring); border-radius:16px;
     padding:8px; margin-bottom:18px; box-shadow:0 6px 22px rgba(0,0,0,.06);
   }
 
+  /* ========== البنر (كودك كامل مع تحسين ريسبونسف) ========== */
+  .banner{
+    position:relative;
+    width:100%; height:225px; max-width:100%;
+    overflow:hidden;
+    border:4px solid var(--silver);
+    border-radius:14px;
+    box-shadow:0 0 18px rgba(219,227,255,.35), inset 0 0 10px rgba(255,255,255,.12);
+    background:
+      radial-gradient(1100px 225px at 20% 50%, rgba(50,225,255,.2), transparent 60%),
+      linear-gradient(90deg, #0b1536 0%, var(--violet) 55%, var(--pink) 100%);
+    isolation:isolate;
+  }
+  .shine{
+    position:absolute; inset:0;
+    background:linear-gradient(75deg, transparent 20%, rgba(255,255,255,.13) 45%, transparent 70%);
+    transform:skewX(-8deg) translateX(-120%);
+    animation:shineMove 6s linear infinite; pointer-events:none;
+  }
+  @keyframes shineMove{ to{ transform:skewX(-8deg) translateX(120%);} }
+
+  .content{
+    position:absolute; inset:0;
+    display:grid;
+    grid-template-columns: 170px 1fr 260px; /* يسار: زر | وسط: نص | يمين: شخصية */
+    align-items:center;
+    gap:10px;
+    padding:14px 18px;
+  }
+
+  /* زر */
+  .cta{ display:flex; align-items:center; justify-content:center; padding-inline:6px; }
+  .cta a{
+    display:inline-block;
+    background:linear-gradient(180deg, var(--cyan), var(--teal));
+    color:#0f0f15;
+    font-weight:800; font-size:18px;
+    text-decoration:none;
+    padding:10px 16px;
+    border-radius:12px;
+    box-shadow:0 6px 14px rgba(0,0,0,.45), 0 0 12px rgba(50,225,255,.45) inset;
+    border:1px solid rgba(0,0,0,.25);
+    text-shadow:0 1px 0 rgba(255,255,255,.5);
+    position:relative; overflow:hidden;
+  }
+  .cta a::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+    transform:translateX(-120%);
+    animation:ctaShine 3.6s ease-in-out infinite;
+  }
+  @keyframes ctaShine{ 50%{ transform:translateX(120%);} }
+
+  /* نصوص */
+  .text{ color:#fff; text-align:center; padding:0 8px; }
+  .title{
+    margin:0 0 6px;
+    font-size:28px; line-height:1.2; font-weight:800;
+    color:#ffffff;
+    text-shadow:0 2px 8px rgba(0,0,0,.55), 0 0 10px rgba(49,225,255,.35);
+    white-space:nowrap;
+  }
+  .subtitle{
+    margin:0;
+    font-size:16.5px; line-height:1.25; font-weight:400;
+    color:#f1f5ff;
+    text-shadow:0 2px 5px rgba(0,0,0,.6);
+  }
+
+  /* شخصية */
+  .mascot{ display:flex; align-items:center; justify-content:center; filter:drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
+  .mascot svg{ height: 180px; width:auto; }
+
+  /* أيقونات متحركة */
+  .floaters{ position:absolute; inset:0; pointer-events:none; }
+  .floater{ position:absolute; opacity:.95; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+  @keyframes floatUp {
+    0% { transform:translateY(0) scale(1) rotate(0deg); opacity:0; }
+    10%{ opacity:1; }
+    80%{ opacity:1; }
+    100%{ transform:translateY(-110px) scale(1.05) rotate(360deg); opacity:0; }
+  }
+  .icon{ animation: floatUp 6s linear infinite; }
+  .i1{ left:80px;  bottom:16px; animation-delay:.2s }
+  .i2{ left:210px; bottom:14px; animation-delay:1.1s }
+  .i3{ left:520px; bottom:12px; animation-delay:1.9s }
+  .i4{ left:700px; bottom:18px; animation-delay:2.7s }
+  .i5{ left:820px; bottom:14px; animation-delay:3.3s }
+  .icon svg{ width:28px; height:28px; }
+  .play svg{ width:30px; height:30px; }
+
+  /* ريسبونسف للبنر */
+  @media (max-width:920px){
+    .title{ font-size:26px }
+    .subtitle{ font-size:15.5px }
+    .banner{ height:200px }
+  }
+  @media (max-width:680px){
+    .banner{ height:180px }
+    .content{
+      grid-template-columns:1fr; grid-template-rows:auto auto;
+      gap:8px; padding:12px; justify-items:center; text-align:center;
+    }
+    .cta a{ width:100%; text-align:center; font-size:16px; padding:10px 14px }
+    .title{ font-size:22px; white-space:normal }
+    .subtitle{ font-size:14px }
+    .mascot{ display:none }
+    .i4, .i5{ display:none }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .icon, .shine, .cta a::after{ animation:none !important }
+  }
+
+  /* ========== كارت الاستبيان ========== */
   .card{
     background:var(--card); border:1px solid var(--ring); border-radius:16px; padding:20px;
     box-shadow:0 8px 28px rgba(16,24,40,.06);
   }
-  h1,h2{
+  h2{
     margin:6px 0 12px; font-size:26px;
     background:linear-gradient(90deg,var(--accent), #FFD54A 35%, #B8860B);
     -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -41,6 +159,7 @@
     border:none; cursor:pointer; border-radius:12px; padding:10px 16px; font-weight:700;
     background:linear-gradient(135deg,#FFD54A,#E6B800); color:#2a2200; box-shadow:0 6px 18px rgba(255,213,74,.25);
   }
+  .ghost{background:#eef1ff; color:#2a2f55}
 
   form{display:grid; gap:14px; scroll-margin-top:90px}
   .grid{display:grid; gap:12px}
@@ -66,23 +185,109 @@
   .msg{padding:10px 12px; border-radius:10px; font-weight:700}
   .ok{background:#e9f8f1; color:#055a38; border:1px solid #bdebd3}
   .err{background:#fdecec; color:#7a1d1d; border:1px solid #f3bcbc}
-
-  /* زر اختبار */
-  .ghost{background:#eef1ff; color:#2a2f55}
 </style>
 </head>
 <body>
   <div class="wrap">
 
-    <!-- ✅ البنر كامل داخل Shadow DOM -->
+    <!-- البنر -->
     <div class="banner-frame">
-      <div id="bannerMount" aria-label="مساحة البنر"></div>
+      <div class="banner" role="img" aria-label="تقديم صانع محتوى">
+        <div class="shine"></div>
+
+        <div class="content">
+          <!-- زر -->
+          <div class="cta">
+            <a href="#creatorForm" aria-label="قدّم الآن">قدّم الآن</a>
+          </div>
+
+          <!-- نصوص -->
+          <div class="text">
+            <h1 class="title">✨ تقديم صانع محتوى</h1>
+            <p class="subtitle">اعرض موهبتك، وقدّم سيرتك وأعمالك للانضمام إلينا.</p>
+          </div>
+
+          <!-- شخصية -->
+          <div class="mascot" aria-hidden="true">
+            <!-- SVG (من كودك) -->
+            <svg viewBox="0 0 230 220" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="120" cy="205" rx="65" ry="10" fill="rgba(0,0,0,.25)"/>
+              <path d="M60 170 Q60 130 90 120 L150 120 Q180 130 180 170 L180 185 Q180 195 170 198 L70 198 Q60 195 60 185 Z"
+                    fill="#1cc8e5" stroke="#0eaec8" stroke-width="2"/>
+              <path d="M150 130 Q165 138 175 160"
+                    fill="none" stroke="#0eaec8" stroke-width="10" stroke-linecap="round"/>
+              <g transform="translate(172,156)">
+                <rect x="-4" y="-4" width="18" height="34" rx="6" fill="#1e1e2b"/>
+                <rect x="-1" y="-1" width="12" height="14" rx="4" fill="#444a65"/>
+                <rect x="-1" y="14" width="12" height="6" rx="2" fill="#2e334a"/>
+              </g>
+              <circle cx="120" cy="90" r="34" fill="#ffdfc9" stroke="#e0b9a4" stroke-width="2"/>
+              <path d="M86 90 Q90 58 120 56 Q150 58 154 90 Q150 78 140 72 Q130 66 120 66 Q110 66 100 72 Q90 78 86 90Z"
+                    fill="#2b2b40"/>
+              <rect x="80" y="84" width="12" height="20" rx="6" fill="#2b2b40"/>
+              <rect x="148" y="84" width="12" height="20" rx="6" fill="#2b2b40"/>
+              <path d="M92 78 Q120 70 148 78" fill="none" stroke="#2b2b40" stroke-width="8" stroke-linecap="round"/>
+              <circle cx="108" cy="92" r="3.2" fill="#1a1a1a"/>
+              <circle cx="132" cy="92" r="3.2" fill="#1a1a1a"/>
+              <path d="M108 104 Q120 112 132 104" fill="none" stroke="#c25b7a" stroke-width="3" stroke-linecap="round"/>
+              <g transform="translate(60,120)">
+                <rect x="0" y="0" width="40" height="22" rx="5" fill="#2d2f48"/>
+                <rect x="28" y="-6" width="10" height="10" rx="2" fill="#2d2f48"/>
+                <circle cx="12" cy="11" r="6" fill="#101222" stroke="#58e8ff" stroke-width="2"/>
+                <circle cx="12" cy="11" r="2" fill="#58e8ff"/>
+              </g>
+              <g transform="translate(95,145)">
+                <rect x="0" y="0" width="16" height="26" rx="3" fill="#141826" stroke="#3ad7ff" stroke-width="1.5"/>
+                <circle cx="8" cy="6" r="3" fill="#ff3d81"/>
+                <rect x="4" y="12" width="8" height="10" rx="2" fill="#20263a"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- أيقونات -->
+        <div class="floaters" aria-hidden="true">
+          <div class="floater icon play i1">
+            <svg viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="20" fill="rgba(50,225,255,.15)" stroke="#32e1ff" stroke-width="3"/>
+              <polygon points="26,22 44,32 26,42" fill="#32e1ff"/>
+            </svg>
+          </div>
+          <div class="floater icon i2">
+            <svg viewBox="0 0 64 64">
+              <rect x="26" y="16" width="12" height="22" rx="6" fill="#ff4fa1"/>
+              <rect x="22" y="36" width="20" height="4" rx="2" fill="#ffd2e7"/>
+              <rect x="30" y="40" width="4" height="8" rx="2" fill="#ffd2e7"/>
+            </svg>
+          </div>
+          <div class="floater icon i3">
+            <svg viewBox="0 0 64 64">
+              <rect x="10" y="22" width="36" height="22" rx="6" fill="#2d2f48"/>
+              <rect x="46" y="26" width="8" height="10" rx="2" fill="#2d2f48"/>
+              <circle cx="28" cy="33" r="7" fill="#101222" stroke="#58e8ff" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="floater icon play i4">
+            <svg viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="20" fill="rgba(255,79,161,.12)" stroke="#ff4fa1" stroke-width="3"/>
+              <polygon points="26,22 44,32 26,42" fill="#ff4fa1"/>
+            </svg>
+          </div>
+          <div class="floater icon i5">
+            <svg viewBox="0 0 64 64">
+              <rect x="26" y="16" width="12" height="22" rx="6" fill="#32e1ff"/>
+              <rect x="22" y="36" width="20" height="4" rx="2" fill="#bfefff"/>
+              <rect x="30" y="40" width="4" height="8" rx="2" fill="#bfefff"/>
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- ===== الاستبيان ===== -->
+    <!-- الاستبيان -->
     <div class="card">
       <h2>نموذج تقديم صانع محتوى</h2>
-      <p class="desc">املأ البيانات، وسنرسلها مباشرة إلى Google Sheets.</p>
+      <p class="desc">املأ البيانات، وسيتم إرسالها مباشرة إلى Google Sheets.</p>
 
       <div class="actions">
         <button type="button" id="guideBtn" class="btn">📘 دليل صانع المحتوى</button>
@@ -213,153 +418,15 @@
   </div>
 
 <script>
-  /* ===== 0) تفعيل البنر داخل Shadow DOM (الكود اللي بعتّه – معدل قليلاً للريسبونسف) ===== */
-  (function mountBanner(){
-    const host = document.getElementById('bannerMount');
-    const root = host.attachShadow({mode:'open'});
-    const style = document.createElement('style');
-    style.textContent = `
-      :host{display:block}
-      :root{ --navy:#0a0f2b; --violet:#6123d6; --pink:#ff4fa1; --cyan:#32e1ff; --teal:#12c2e9; --silver:#dbe3ff; }
-      .banner{
-        position:relative; width:100%; height:225px; max-width:100%;
-        overflow:hidden; border:4px solid var(--silver); border-radius:14px;
-        box-shadow:0 0 18px rgba(219,227,255,.35), inset 0 0 10px rgba(255,255,255,.12);
-        background:
-          radial-gradient(1100px 225px at 20% 50%, rgba(50,225,255,.2), transparent 60%),
-          linear-gradient(90deg, #0b1536 0%, var(--violet) 55%, var(--pink) 100%);
-        isolation:isolate;
-      }
-      .shine{position:absolute; inset:0; background:linear-gradient(75deg, transparent 20%, rgba(255,255,255,.13) 45%, transparent 70%);
-        transform:skewX(-8deg) translateX(-120%); animation:shineMove 6s linear infinite; pointer-events:none;}
-      @keyframes shineMove{ to{ transform:skewX(-8deg) translateX(120%);} }
-      .content{position:absolute; inset:0; display:grid; grid-template-columns:170px 1fr 260px; align-items:center; gap:10px; padding:14px 18px;}
-      .cta{ display:flex; align-items:center; justify-content:center; padding-inline:6px; }
-      .cta a{ display:inline-block; background:linear-gradient(180deg, var(--cyan), var(--teal)); color:#0f0f15; font-weight:800; font-size:18px; text-decoration:none; padding:10px 16px; border-radius:12px; box-shadow:0 6px 14px rgba(0,0,0,.45), 0 0 12px rgba(50,225,255,.45) inset; border:1px solid rgba(0,0,0,.25); text-shadow:0 1px 0 rgba(255,255,255,.5); position:relative; overflow:hidden; }
-      .cta a::after{ content:""; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transform:translateX(-120%); animation:ctaShine 3.6s ease-in-out infinite; }
-      @keyframes ctaShine{ 50%{ transform:translateX(120%);} }
-      .text{ color:#fff; text-align:center; padding:0 8px; }
-      .title{ margin:0 0 6px; font-size:28px; line-height:1.2; font-weight:800; color:#ffffff; text-shadow:0 2px 8px rgba(0,0,0,.55), 0 0 10px rgba(49,225,255,.35); white-space:nowrap; }
-      .subtitle{ margin:0; font-size:16.5px; line-height:1.25; color:#f1f5ff; text-shadow:0 2px 5px rgba(0,0,0,.6); }
-      .mascot{ display:flex; align-items:center; justify-content:center; filter:drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
-      .mascot svg{ height: 180px; width:auto; }
-      .floaters{ position:absolute; inset:0; pointer-events:none; }
-      .floater{ position:absolute; opacity:.95; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
-      @keyframes floatUp { 0% { transform:translateY(0) scale(1) rotate(0deg); opacity:0; } 10%{ opacity:1; } 80%{ opacity:1; } 100%{ transform:translateY(-110px) scale(1.05) rotate(360deg); opacity:0; } }
-      .icon{ animation: floatUp 6s linear infinite; }
-      .i1{ left:80px;  bottom:16px; animation-delay:.2s }
-      .i2{ left:210px; bottom:14px; animation-delay:1.1s }
-      .i3{ left:520px; bottom:12px; animation-delay:1.9s }
-      .i4{ left:700px; bottom:18px; animation-delay:2.7s }
-      .i5{ left:820px; bottom:14px; animation-delay:3.3س }
-      .icon svg{ width:28px; height:28px; }
-      .play svg{ width:30px; height:30px; }
-      @media (max-width:920px){
-        .title{ font-size:26px }
-        .subtitle{ font-size:15.5px }
-        .banner{ height:200px }
-      }
-      @media (max-width:680px){
-        .banner{ height:180px }
-        .content{ grid-template-columns:1fr; grid-template-rows:auto auto; gap:8px; padding:12px; justify-items:center; text-align:center; }
-        .cta a{ width:100%; text-align:center; font-size:16px; padding:10px 14px }
-        .title{ font-size:22px; white-space:normal }
-        .subtitle{ font-size:14px }
-        .mascot{ display:none }
-        .i4, .i5{ display:none }
-      }
-    `;
-    const html = document.createElement('div');
-    html.innerHTML = `
-      <div class="banner" role="img" aria-label="تقديم صانع محتوى">
-        <div class="shine"></div>
-        <div class="content">
-          <div class="cta"><a href="#creatorForm" aria-label="قدّم الآن">قدّم الآن</a></div>
-          <div class="text">
-            <h1 class="title">✨ تقديم صانع محتوى</h1>
-            <p class="subtitle">اعرض موهبتك، وقدّم سيرتك وأعمالك للانضمام إلينا.</p>
-          </div>
-          <div class="mascot" aria-hidden="true">
-            <!-- SVG من كودك -->
-            <svg viewBox="0 0 230 220" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="120" cy="205" rx="65" ry="10" fill="rgba(0,0,0,.25)"/>
-              <path d="M60 170 Q60 130 90 120 L150 120 Q180 130 180 170 L180 185 Q180 195 170 198 L70 198 Q60 195 60 185 Z" fill="#1cc8e5" stroke="#0eaec8" stroke-width="2"/>
-              <path d="M150 130 Q165 138 175 160" fill="none" stroke="#0eaec8" stroke-width="10" stroke-linecap="round"/>
-              <g transform="translate(172,156)">
-                <rect x="-4" y="-4" width="18" height="34" rx="6" fill="#1e1e2b"/>
-                <rect x="-1" y="-1" width="12" height="14" rx="4" fill="#444a65"/>
-                <rect x="-1" y="14" width="12" height="6" rx="2" fill="#2e334a"/>
-              </g>
-              <circle cx="120" cy="90" r="34" fill="#ffdfc9" stroke="#e0b9a4" stroke-width="2"/>
-              <path d="M86 90 Q90 58 120 56 Q150 58 154 90 Q150 78 140 72 Q130 66 120 66 Q110 66 100 72 Q90 78 86 90Z" fill="#2b2b40"/>
-              <rect x="80" y="84" width="12" height="20" rx="6" fill="#2b2b40"/>
-              <rect x="148" y="84" width="12" height="20" rx="6" fill="#2b2b40"/>
-              <path d="M92 78 Q120 70 148 78" fill="none" stroke="#2b2b40" stroke-width="8" stroke-linecap="round"/>
-              <circle cx="108" cy="92" r="3.2" fill="#1a1a1a"/>
-              <circle cx="132" cy="92" r="3.2" fill="#1a1a1a"/>
-              <path d="M108 104 Q120 112 132 104" fill="none" stroke="#c25b7a" stroke-width="3" stroke-linecap="round"/>
-              <g transform="translate(60,120)">
-                <rect x="0" y="0" width="40" height="22" rx="5" fill="#2d2f48"/>
-                <rect x="28" y="-6" width="10" height="10" rx="2" fill="#2d2f48"/>
-                <circle cx="12" cy="11" r="6" fill="#101222" stroke="#58e8ff" stroke-width="2"/>
-                <circle cx="12" cy="11" r="2" fill="#58e8ff"/>
-              </g>
-              <g transform="translate(95,145)">
-                <rect x="0" y="0" width="16" height="26" rx="3" fill="#141826" stroke="#3ad7ff" stroke-width="1.5"/>
-                <circle cx="8" cy="6" r="3" fill="#ff3d81"/>
-                <rect x="4" y="12" width="8" height="10" rx="2" fill="#20263a"/>
-              </g>
-            </svg>
-          </div>
-        </div>
-        <div class="floaters" aria-hidden="true">
-          <div class="floater icon play i1">
-            <svg viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="20" fill="rgba(50,225,255,.15)" stroke="#32e1ff" stroke-width="3"/>
-              <polygon points="26,22 44,32 26,42" fill="#32e1ff"/>
-            </svg>
-          </div>
-          <div class="floater icon i2">
-            <svg viewBox="0 0 64 64">
-              <rect x="26" y="16" width="12" height="22" rx="6" fill="#ff4fa1"/>
-              <rect x="22" y="36" width="20" height="4" rx="2" fill="#ffd2e7"/>
-              <rect x="30" y="40" width="4" height="8" rx="2" fill="#ffd2e7"/>
-            </svg>
-          </div>
-          <div class="floater icon i3">
-            <svg viewBox="0 0 64 64">
-              <rect x="10" y="22" width="36" height="22" rx="6" fill="#2d2f48"/>
-              <rect x="46" y="26" width="8" height="10" rx="2" fill="#2d2f48"/>
-              <circle cx="28" cy="33" r="7" fill="#101222" stroke="#58e8ff" stroke-width="3"/>
-            </svg>
-          </div>
-          <div class="floater icon play i4">
-            <svg viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="20" fill="rgba(255,79,161,.12)" stroke="#ff4fa1" stroke-width="3"/>
-              <polygon points="26,22 44,32 26,42" fill="#ff4fa1"/>
-            </svg>
-          </div>
-          <div class="floater icon i5">
-            <svg viewBox="0 0 64 64">
-              <rect x="26" y="16" width="12" height="22" rx="6" fill="#32e1ff"/>
-              <rect x="22" y="36" width="20" height="4" rx="2" fill="#bfefff"/>
-              <rect x="30" y="40" width="4" height="8" rx="2" fill="#bfefff"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    `;
-    root.append(style, html);
-  })();
-
-  /* ===== 1) روابط خارجية ===== */
+  /* روابط */
   const GUIDE_URL  = "https://a7medras.github.io/broadcaster-guide/";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTcjv4xTYC3ZGIYmveXHa8n0UQpFMIK_TRncQfbRhPedSrLV4UiQu2qQkWDIy2kjofTA/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb6QmbgguRd5ZEfGmAHkNwEzbXs4TdVW1m-8TLAX4wk19qx4lY7b4BYyI4g2kq4T0yIA/exec";
+
   document.getElementById('guideBtn').addEventListener('click', () => {
     window.open(GUIDE_URL, "_blank", "noopener");
   });
 
-  /* ===== 2) مقدّمة الواتساب حسب الدولة ===== */
+  /* مقدّمة الواتساب حسب الدولة */
   const dialByCountry = {
     EG:"+20", SA:"+966", AE:"+971", KW:"+965", QA:"+974", BH:"+973", OM:"+968",
     YE:"+967", JO:"+962", LB:"+961", SY:"+963", IQ:"+964", PS:"+970", IL:"+972",
@@ -374,7 +441,7 @@
     whats.focus();
   });
 
-  /* ===== 3) منطق المواهب والمنصات ===== */
+  /* منطق المواهب والمنصات */
   const talentBox = document.getElementById('talentBox');
   const talentOtherChk = document.getElementById('talentOtherChk');
   const talentOtherWrap = document.getElementById('talentOtherWrap');
@@ -406,18 +473,18 @@
     });
   });
 
-  /* ===== 4) الإرسال إلى Google Sheets ===== */
+  /* إرسال البيانات إلى Google Sheets */
   const form = document.getElementById('creatorForm');
   const formMsg = document.getElementById('formMsg');
 
   async function sendToSheet(payload){
     await fetch(SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",                 // مهم لتخطّي CORS على GitHub Pages
+      mode: "no-cors",                 // لتجاوز CORS على GitHub Pages
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
-    // no-cors → مش هنقرأ الرد، لكن السكربت بيستقبل
+    // مع no-cors مش هنقرأ الرد، لكن السكربت هيستقبل ويضيف صف
   }
 
   form.addEventListener('submit', async (e) => {
@@ -472,7 +539,7 @@
     }
   });
 
-  /* ===== 5) زر اختبار الإرسال ===== */
+  /* زر اختبار الإرسال */
   document.getElementById('testSubmit').addEventListener('click', async ()=>{
     const sample = {
       name: "TEST USER",
@@ -493,7 +560,7 @@
     const msg = document.getElementById('formMsg');
     try{
       await sendToSheet(sample);
-      msg.textContent = "تم إرسال اختبار بنجاح ✅ — افحص Google Sheet";
+      msg.textContent = "تم إرسال اختبار بنجاح ✅ — افتح الشيت وتأكد من ظهور صف جديد.";
       msg.className = "msg ok"; msg.classList.remove('hidden');
     }catch(e){
       msg.textContent = "تعذر إرسال الاختبار ❌"; msg.className = "msg err"; msg.classList.remove('hidden');
