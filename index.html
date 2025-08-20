@@ -562,9 +562,12 @@
     });
   });
 
-  /* ===== Submit to Google Sheets ===== */
-  const form = document.getElementById('creatorForm');
-  const formMsg = document.getElementById('formMsg');
+  /* ===== Helpers ===== */
+  function genTicketId(){
+    // مثال: T-8Q3KZ-6QF2 (قصير ومميز)
+    const part = () => Math.random().toString(36).slice(2,6).toUpperCase();
+    return "T-" + part() + "-" + part();
+  }
 
   async function sendToSheet(payload){
     await fetch(SCRIPT_URL, {
@@ -574,6 +577,10 @@
       body: JSON.stringify(payload)
     });
   }
+
+  /* ===== Submit to Google Sheets + Redirect ===== */
+  const form = document.getElementById('creatorForm');
+  const formMsg = document.getElementById('formMsg');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -587,10 +594,14 @@
       return;
     }
 
+    // جهّز بيانات الإرسال
+    const ticketId = genTicketId();
     const data = {
+      ticketId,
       name: document.getElementById('name').value.trim(),
       gender: document.getElementById('gender').value,
       country: countrySel.options[countrySel.selectedIndex]?.text || "",
+      countryValue: countrySel.value || "",
       countryCode: dialPrefix.textContent,
       whatsapp: whats.value.replace(/\D/g,"").trim(),
       likee: document.getElementById('likee').value.trim(),
@@ -608,18 +619,13 @@
     submitBtn.disabled = true;
 
     try {
+      // ابعت للشييت
       await sendToSheet(data);
-      formMsg.textContent = (lang==="ar") ? "تم إرسال الاستبيان بنجاح ✅" : "Submitted successfully ✅";
-      formMsg.className = "msg ok";
-      formMsg.classList.remove('hidden');
 
-      form.reset();
-      dialPrefix.textContent = "+20";
-      talentBox.classList.add('hidden');
-      talentOtherWrap.classList.add('hidden');
-      platformWrap.classList.add('hidden');
-      waError.classList.add('hidden');
-      onCountryChange();
+      // حوّل لصفحة الشكر بالكود
+      window.location.href = "thankyou.html?ticket=" + encodeURIComponent(ticketId);
+
+      // ملاحظة: الكود بعدها مش هيتنفذ لأن الصفحة هتتنقل
     } catch (err) {
       console.error(err);
       formMsg.textContent = (lang==="ar") ? "حصل خطأ أثناء الإرسال ❌" : "Submission error ❌";
@@ -630,12 +636,15 @@
     }
   });
 
-  /* ===== Test button ===== */
+  /* ===== Test button – sends sample & redirects ===== */
   document.getElementById('testSubmit').addEventListener('click', async ()=>{
+    const ticketId = genTicketId();
     const sample = {
+      ticketId,
       name: "TEST USER",
       gender: "ذكر",
       country: "مصر",
+      countryValue: "EG",
       countryCode: "+20",
       whatsapp: "1000000000",
       likee: "likee_test",
@@ -648,12 +657,11 @@
       invite: "TEST",
       submittedAt: new Date().toISOString()
     };
-    const msg = document.getElementById('formMsg');
     try{
       await sendToSheet(sample);
-      msg.textContent = (lang==="ar") ? "تم إرسال اختبار بنجاح ✅ — افحص Google Sheet" : "Test row sent ✅ — check your Sheet";
-      msg.className = "msg ok"; msg.classList.remove('hidden');
+      window.location.href = "thankyou.html?ticket=" + encodeURIComponent(ticketId);
     }catch(e){
+      const msg = document.getElementById('formMsg');
       msg.textContent = (lang==="ar") ? "تعذر إرسال الاختبار ❌" : "Test failed ❌";
       msg.className = "msg err"; msg.classList.remove('hidden');
     }
